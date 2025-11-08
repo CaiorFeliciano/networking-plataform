@@ -1,0 +1,30 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model MemberApplication {
+  id          String            @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String
+  company     String?
+  motivation  String?
+  status      ApplicationStatus @default(PENDING)
+  submittedAt DateTime          @default(now())
+  reviewedAt  DateTime?
+  notes       String?
+
+  @@map("member_applications")
+}
