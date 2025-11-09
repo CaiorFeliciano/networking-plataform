@@ -20,6 +20,14 @@ enum MemberStatus {
   SUSPENDED
 }
 
+enum ReferralStatus {
+  PENDING
+  CONTACTED
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
 model MemberApplication {
   id          String            @id @default(cuid())
   firstName   String
@@ -69,9 +77,47 @@ model Member {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  // Relacionamentos
   invitationId String?
   invitation   Invitation? @relation(fields: [invitationId], references: [id])
   
   @@map("members")
+  referralsMade     Referral[] @relation("ReferralsMade")
+  referralsReceived Referral[] @relation("ReferralsReceived")
+  thanksGiven       Thank[]    @relation("ThanksGiven")
+  thanksReceived    Thank[]    @relation("ThanksReceived")
+}
+
+model Referral {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  fromMemberId String
+  fromMember  Member   @relation("ReferralsMade", fields: [fromMemberId], references: [id])
+  toMemberId  String
+  toMember    Member   @relation("ReferralsReceived", fields: [toMemberId], references: [id])
+  status      ReferralStatus @default(PENDING)
+  value       Float?
+  company     String?
+  contactName String?
+  contactInfo String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  closedAt    DateTime?
+
+  @@map("referrals")
+  thanks Thank[]
+}
+
+model Thank {
+  id          String   @id @default(cuid())
+  fromMemberId String
+  fromMember  Member   @relation("ThanksGiven", fields: [fromMemberId], references: [id])
+  toMemberId  String
+  toMember    Member   @relation("ThanksReceived", fields: [toMemberId], references: [id])
+  message     String
+  referralId  String?
+  referral    Referral? @relation(fields: [referralId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@map("thanks")
 }
