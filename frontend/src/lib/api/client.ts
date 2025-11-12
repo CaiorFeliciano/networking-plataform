@@ -1,6 +1,21 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 class ApiClient {
+  async getDashboardStats() {
+    return this.request("/dashboard/metrics", {
+      headers: {
+        "x-admin-api-key": process.env.NEXT_PUBLIC_ADMIN_API_KEY!,
+      },
+    });
+  }
+
+  async getRecentActivity() {
+    return this.request("/dashboard/recent-activity", {
+      headers: {
+        "x-admin-api-key": process.env.NEXT_PUBLIC_ADMIN_API_KEY!,
+      },
+    });
+  }
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
